@@ -1,0 +1,13 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+
+
+resources:
+  - PVC-centurion.yaml
+  - Deployment-api.yaml
+  - Deployment-worker.yaml
+  - Service-api.yaml
+
+
