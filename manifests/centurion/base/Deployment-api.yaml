@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: centurion
   name: api
 spec:
+
   selector:
     matchLabels:
       app.kubernetes.io/component: API
