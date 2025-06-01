@@ -28,7 +28,7 @@ jobs:
           # account: ${{secrets.KUBESCAPE_ACCOUNT}}
           # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
           # server: ${{ vars.KUBESCAPE_SERVER }}
-          # files: ${{ steps.changed-files.outputs.all_changed_files }}
+          files: ${{ steps.changed-files.outputs.all_changed_files }}
           fixFiles: true
           format: "sarif"
 
