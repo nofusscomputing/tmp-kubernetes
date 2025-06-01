@@ -22,7 +22,6 @@ on: [ pull_request ]
 
 jobs:
 
-
   kubescape:
     runs-on: ubuntu-latest
     permissions:
