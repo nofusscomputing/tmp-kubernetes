@@ -26,12 +26,18 @@ jobs:
 
       - uses: kubescape/github-action@main
         with:
+          outputFile: results
           # account: ${{secrets.KUBESCAPE_ACCOUNT}}
           # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
           # server: ${{ vars.KUBESCAPE_SERVER }}
-          files: ${{ steps.changed-files.outputs.all_changed_files }}
+          # files: ${{ steps.changed-files.outputs.all_changed_files }}
           fixFiles: true
           format: "sarif"
+
+      - name: Upload Kubescape scan results to Github Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
 
       - name: PR Suggester according to SARIF file
         # if: github.event_name == 'pull_request_target'
