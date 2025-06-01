@@ -57,6 +57,10 @@ jobs:
           chmod +x "$KUBESCAPE_DIR/kubescape"
           echo "$KUBESCAPE_DIR" >> $GITHUB_PATH
           
+      - name: Run Kubescape debug
+        run: |
+          kubescape list frameworks
+
       - name: Run Kubescape scan
         run: |
           kubescape scan framework mitre,nsa manifests/centurion/base \
