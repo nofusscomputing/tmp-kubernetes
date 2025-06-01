@@ -41,7 +41,7 @@ jobs:
           # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
           # server: ${{ vars.KUBESCAPE_SERVER }}
           # # Optional: Scan a specific path. Default will scan the whole repository
-          # files: "manifests/*.yaml"
+          files: "${PWD}/manifests/*.yaml"
           frameworks: NSA,MITRE
           verbose: true
           severityThreshold: low
