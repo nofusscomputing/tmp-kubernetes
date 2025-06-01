@@ -28,8 +28,8 @@
             "url": "https://github.com/adrienverge/yamllint"
         }
     },
-    "editor.tabSize": 4,
-    "files.eol": "\n",
     "editor.detectIndentation": false,
-    "editor.indentSize": "tabSize"
+    "editor.indentSize": "tabSize",
+    "editor.tabSize": 2,
+    "files.eol": "\n"
 }
