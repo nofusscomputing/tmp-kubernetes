@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: centurion-ui
+spec:
+  endpointSelector:
+    matchLabels:
+      name: centurion
+      component: ui
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+            app.kubernetes.io/component: controller
+            io.kubernetes.pod.namespace: ingress
+      toPorts:
+        - ports:
+            - port: "80"
+  egress:
+    - {}
