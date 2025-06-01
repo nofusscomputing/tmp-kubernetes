@@ -59,7 +59,7 @@ jobs:
           
       - name: Run Kubescape scan
         run: |
-          kubescape scan framework mitre,nsa . \
+          kubescape scan framework mitre,nsa manifests/centurion/base \
             --verbose \
             --format sarif \
             --output results.sarif

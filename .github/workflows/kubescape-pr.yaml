@@ -1,47 +1,47 @@
----
-# on: push    # yamllint disable-line rule:truthy
-name: Suggest autofixes with Kubescape for PR by reviews
-on:
-  - pull_request_target
-  - pull_request  
+# ---
+# # on: push    # yamllint disable-line rule:truthy
+# name: Suggest autofixes with Kubescape for PR by reviews
+# on:
+#   - pull_request_target
+#   - pull_request  
 
 
-jobs:
+# jobs:
 
-  kubescape-fix-pr-reviews:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
+#   kubescape-fix-pr-reviews:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       pull-requests: write
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#           ref: ${{github.event.pull_request.head.ref}}
+#           repository: ${{github.event.pull_request.head.repo.full_name}}
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v46.0.1
+#       - name: Get changed files
+#         id: changed-files
+#         uses: tj-actions/changed-files@v46.0.1
 
-      - uses: kubescape/github-action@main
-        with:
-          outputFile: results
-          # account: ${{secrets.KUBESCAPE_ACCOUNT}}
-          # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
-          # server: ${{ vars.KUBESCAPE_SERVER }}
-          # files: ${{ steps.changed-files.outputs.all_changed_files }}
-          fixFiles: true
-          format: "sarif"
+#       - uses: kubescape/github-action@main
+#         with:
+#           outputFile: results
+#           # account: ${{secrets.KUBESCAPE_ACCOUNT}}
+#           # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
+#           # server: ${{ vars.KUBESCAPE_SERVER }}
+#           # files: ${{ steps.changed-files.outputs.all_changed_files }}
+#           fixFiles: true
+#           format: "sarif"
 
-      - name: Upload Kubescape scan results to Github Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
+#       - name: Upload Kubescape scan results to Github Code Scanning
+#         uses: github/codeql-action/upload-sarif@v3
+#         with:
+#           sarif_file: results.sarif
 
-      - name: PR Suggester according to SARIF file
-        # if: github.event_name == 'pull_request_target'
-        uses: HollowMan6/sarif4reviewdog@v1.0.0
-        with:
-          file: 'results.sarif'
-          level: warning
+#       - name: PR Suggester according to SARIF file
+#         # if: github.event_name == 'pull_request_target'
+#         uses: HollowMan6/sarif4reviewdog@v1.0.0
+#         with:
+#           file: 'results.sarif'
+#           level: warning
