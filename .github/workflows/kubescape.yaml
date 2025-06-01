@@ -18,7 +18,7 @@
 #         severityThreshold: low
 # on: push    # yamllint disable-line rule:truthy
 name: Kubescape scanning for misconfigurations
-on: [ pull_request ]
+on: [ pull_request, push ]
 
 jobs:
 
@@ -45,6 +45,14 @@ jobs:
           frameworks: NSA,MITRE
           verbose: true
           severityThreshold: low
+
+      - name: Debug SARIF Contents
+        run: |
+          if [ -f results.sarif ]; then
+            cat results.sarif
+          else
+            echo "No SARIF file generated"
+          fi
 
       - name: Upload Kubescape scan results to Github Code Scanning
         uses: github/codeql-action/upload-sarif@v3
