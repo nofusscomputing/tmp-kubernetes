@@ -18,7 +18,9 @@
 #         severityThreshold: low
 # on: push    # yamllint disable-line rule:truthy
 name: Kubescape scanning for misconfigurations
-on: [ pull_request, push ]
+on: 
+  - pull_request
+  # - push
 
 jobs:
 
