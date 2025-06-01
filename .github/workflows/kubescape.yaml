@@ -51,6 +51,12 @@ jobs:
         with:
           sarif_file: results.sarif
 
+      - name: Upload scan results (json Report)
+        uses: actions/upload-artifact@v4
+        with:
+          name: results.sarif
+          path: results.sarif
+
       - name: PR Suggester according to SARIF file
         # if: github.event_name == 'pull_request_target'
         uses: HollowMan6/sarif4reviewdog@v1.0.0
