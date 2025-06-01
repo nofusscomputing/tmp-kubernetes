@@ -45,7 +45,7 @@ spec:
                       - containerPort: 8080
                         name: metrics
   
-                  volumeMounts:
+                   volumeMounts:
                       - name: data
                         mountPath: /data
                         subPath: data
