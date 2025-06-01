@@ -31,20 +31,35 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v3
-      - uses: kubescape/github-action@main
-        continue-on-error: true
-        with:
-          format: sarif
-          outputFile: results
-          # # Optional: Specify the Kubescape Portal credentials 
-          # account: ${{secrets.KUBESCAPE_ACCOUNT}}
-          # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
-          # server: ${{ vars.KUBESCAPE_SERVER }}
-          # # Optional: Scan a specific path. Default will scan the whole repository
-          files: "${PWD}/manifests/*.yaml"
-          frameworks: NSA,MITRE
-          verbose: true
-          severityThreshold: low
+      # - uses: kubescape/github-action@main
+      #   continue-on-error: true
+      #   with:
+      #     format: sarif
+      #     outputFile: results
+      #     # # Optional: Specify the Kubescape Portal credentials 
+      #     # account: ${{secrets.KUBESCAPE_ACCOUNT}}
+      #     # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
+      #     # server: ${{ vars.KUBESCAPE_SERVER }}
+      #     # # Optional: Scan a specific path. Default will scan the whole repository
+      #     files: "${PWD}/manifests/*.yaml"
+      #     frameworks: NSA,MITRE
+      #     verbose: true
+      #     severityThreshold: low
+
+      - name: Install Kubescape
+        run: |
+          KUBESCAPE_DIR="$HOME/kubescape-bin"
+          mkdir -p "$KUBESCAPE_DIR"
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/kubescape/kubescape/releases/latest | jq -r .tag_name)
+          curl -sL "https://github.com/kubescape/kubescape/releases/download/${LATEST_VERSION}/kubescape-ubuntu-latest" -o "$KUBESCAPE_DIR/kubescape"
+          chmod +x "$KUBESCAPE_DIR/kubescape"
+          echo "$KUBESCAPE_DIR" >> $GITHUB_PATH
+          
+      - name: Run Kubescape scan
+        run: |
+          kubescape scan . \
+            --format sarif \
+            --output results.sarif
 
       - name: Debug SARIF Contents
         run: |
