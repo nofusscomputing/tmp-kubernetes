@@ -1,8 +1,14 @@
 ---
-on: push    # yamllint disable-line rule:truthy
+# on: push    # yamllint disable-line rule:truthy
+
+on:
+    push:
+        branches:
+            - "**"
+        tags:
+            - "*"
 
 jobs:
-
     lint:
         runs-on: ubuntu-latest
         steps:
