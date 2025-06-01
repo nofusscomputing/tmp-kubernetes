@@ -9,5 +9,8 @@ resources:
   - Deployment-api.yaml
   - Deployment-worker.yaml
   - Service-api.yaml
+  - CiliumNetworkPolicy-centurion-api.yaml
+  - CiliumNetworkPolicy-centurion-ui.yaml
+  - CiliumNetworkPolicy-centurion-worker.yaml
 
 
