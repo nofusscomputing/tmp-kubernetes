@@ -2,7 +2,8 @@
 # on: push    # yamllint disable-line rule:truthy
 name: Suggest autofixes with Kubescape for PR by reviews
 on:
-  pull_request_target:
+  - pull_request_target
+  - pull_request  
 
 
 jobs:
