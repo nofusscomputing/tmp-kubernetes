@@ -1,102 +1,100 @@
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    labels:
+  labels:
+    app.kubernetes.io/component: API
+    app.kubernetes.io/name: centurion
+  name: api
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: API
+      app.kubernetes.io/name: centurion
+  replicas: 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
         app.kubernetes.io/component: API
         app.kubernetes.io/name: centurion
-    name: api
-spec:
-    selector:
-        matchLabels:
-            app.kubernetes.io/component: API
-            app.kubernetes.io/name: centurion
-    replicas: 1
-    minReadySeconds: 10
-    template:
-        metadata:
-            labels:
-                app.kubernetes.io/component: API
-                app.kubernetes.io/name: centurion
-        spec:
-            terminationGracePeriodSeconds: 10
-            affinity: { }
+    spec:
+      terminationGracePeriodSeconds: 10
+      affinity: {}
+      containers:
+        - name: web
+          image: nofusscomputing/centurion-erp:dev
+          env:
+            - name: PROMETHEUS_MULTIPROC_DIR
+              value: "/tmp/prometheus"
+          resources:
+            limits:
+              cpu: 1500m
+              # memory: 800Mi    # OOMKilled
+              memory: 1Gi
+            requests:
+              cpu: 10m
+              memory: 20Mi
 
+          ports:
+            - containerPort: 8000
+              name: http
+            - containerPort: 8080
+              name: metrics
 
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              subPath: data
 
-            containers:
-                - name: web
-                  image: nofusscomputing/centurion-erp:dev
-                  env:
-                      - name: PROMETHEUS_MULTIPROC_DIR
-                        value: "/tmp/prometheus"
-                  resources:
-                      limits:
-                          cpu: 1500m
-                          # memory: 800Mi    # OOMKilled
-                          memory: 1Gi
-                      requests:
-                          cpu: 10m
-                          memory: 20Mi
+            - name: celery-broker
+              mountPath: /etc/itsm/celery-broker.py
+              subPath: celery-broker.py
+              readOnly: true
 
-                  ports: 
-                      - containerPort: 8000
-                        name: http
-                      - containerPort: 8080
-                        name: metrics
-  
-                   volumeMounts:
-                      - name: data
-                        mountPath: /data
-                        subPath: data
+            - name: configuration
+              mountPath: /etc/itsm/settings.py
+              subPath: settings.py
+              readOnly: true
 
-                      - name: celery-broker
-                        mountPath: /etc/itsm/celery-broker.py
-                        subPath: celery-broker.py
-                        readOnly: true
+            - name: database
+              mountPath: /etc/itsm/database.py
+              subPath: database.py
+              readOnly: true
 
-                      - name: configuration
-                        mountPath: /etc/itsm/settings.py
-                        subPath: settings.py
-                        readOnly: true
+            - mountPath: /tmp
+              name: tmp
+              subPath: tmp
 
-                      - name: database
-                        mountPath: /etc/itsm/database.py
-                        subPath: database.py
-                        readOnly: true
+      tolerations: []
+      volumes:
+        - name: celery-broker
+          secret:
+            secretName: celery-broker
+            items:
+              - key: celery-broker.py
+                path: celery-broker.py
 
-                      - mountPath: /tmp
-                        name: tmp
-                        subPath: tmp
+        - name: configuration
+          configMap:
+            name: configuration
+            items:
+              - key: settings.py
+                path: settings.py
 
-            tolerations: []
-            volumes:
-                - name: celery-broker
-                  secret:
-                      secretName: celery-broker
-                      items:
-                          - key: celery-broker.py
-                            path: celery-broker.py
+        - name: data
+          persistentVolumeClaim:
+            claimName: centurion
 
-                - name: configuration
-                  configMap:
-                      name: configuration
-                      items:
-                          - key: settings.py
-                            path: settings.py
+        - name: database
+          secret:
+            secretName: database
+            items:
+              - key: database.py
+                path: database.py
 
-                - name: data
-                  persistentVolumeClaim:
-                      claimName: centurion
-
-                - name: database
-                  secret:
-                      secretName: database
-                      items:
-                          - key: database.py
-                            path: database.py
-
-                - name: tmp
-                  emptyDir:
-                      medium: Memory
-                      # sizeLimit: 64Mi
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            # sizeLimit: 64Mi
