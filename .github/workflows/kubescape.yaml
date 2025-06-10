@@ -59,7 +59,7 @@ jobs:
           
       - name: Run Kubescape debug
         run: |
-          kubescape --helh
+          kubescape scan --help
 
       - name: Run Kubescape scan
         run: |
