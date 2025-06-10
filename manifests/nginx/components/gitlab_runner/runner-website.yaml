@@ -1,0 +1,33 @@
+---
+
+apiVersion: apps.gitlab.com/v1beta2
+kind: Runner
+metadata:
+  name: gitlab-runner
+spec:
+  gitlabUrl: https://gitlab.com
+  podSpec:
+    - name: gitlab-runner
+      patchType: merge
+      patch: |
+        securityContext:
+          runAsNonRoot: false
+
+    #   # Production patch: why - the runner pod will need to be on the same node as the website web server
+    # - name: website-runner
+    #   patchType: merge
+    #   patch: |
+    #     affinity:
+    #       nodeAffinity:
+    #         requiredDuringSchedulingIgnoredDuringExecution:
+    #           nodeSelectorTerms:
+    #           - matchExpressions:
+    #             - key: kubernetes.io/arch
+    #               operator: In
+    #               values:
+    #               - amd64
+    #     securityContext:
+    #       runAsNonRoot: false
+  # runnerImage: "see-patch"
+  token: token-secret-name
+  # tags: tag1,tag2
