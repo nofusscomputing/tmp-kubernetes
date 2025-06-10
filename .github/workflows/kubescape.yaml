@@ -1,0 +1,96 @@
+---
+# name: Kubescape scanning for misconfigurations
+# on: [ pull_request ]
+# jobs:
+#   kubescape:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       actions: read
+#       contents: read
+#       security-events: write
+#     steps:
+#     - uses: actions/checkout@v3
+#     - uses: kubescape/github-action@main
+#       continue-on-error: false
+#       with:
+#         frameworks: NSA,MITRE
+#         verbose: true
+#         severityThreshold: low
+# on: push    # yamllint disable-line rule:truthy
+name: Kubescape scanning for misconfigurations
+on: 
+  - pull_request
+  # - push
+
+jobs:
+
+  kubescape:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+      # - uses: kubescape/github-action@main
+      #   continue-on-error: true
+      #   with:
+      #     format: sarif
+      #     outputFile: results
+      #     # # Optional: Specify the Kubescape Portal credentials 
+      #     # account: ${{secrets.KUBESCAPE_ACCOUNT}}
+      #     # accessKey: ${{secrets.KUBESCAPE_ACCESS_KEY}}
+      #     # server: ${{ vars.KUBESCAPE_SERVER }}
+      #     # # Optional: Scan a specific path. Default will scan the whole repository
+      #     files: "${PWD}/manifests/*.yaml"
+      #     frameworks: NSA,MITRE
+      #     verbose: true
+      #     severityThreshold: low
+
+      - name: Install Kubescape
+        run: |
+          KUBESCAPE_DIR="$HOME/kubescape-bin"
+          mkdir -p "$KUBESCAPE_DIR"
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/kubescape/kubescape/releases/latest | jq -r .tag_name)
+          curl -sL "https://github.com/kubescape/kubescape/releases/download/${LATEST_VERSION}/kubescape-ubuntu-latest" -o "$KUBESCAPE_DIR/kubescape"
+          chmod +x "$KUBESCAPE_DIR/kubescape"
+          echo "$KUBESCAPE_DIR" >> $GITHUB_PATH
+          
+      - name: Run Kubescape debug
+        run: |
+          kubescape scan --help
+
+      - name: Run Kubescape scan
+        run: |
+          kubescape scan framework AllControls ${PWD}/manifests/nginx/overlays/static-site-gitlab-built/ \
+            --verbose \
+            --format sarif \
+            --output results.sarif
+
+      - name: Debug SARIF Contents
+        run: |
+          if [ -f results.sarif ]; then
+            cat results.sarif
+          else
+            echo "No SARIF file generated"
+          fi
+
+      - name: Upload Kubescape scan results to Github Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+
+      - name: Upload scan results (json Report)
+        uses: actions/upload-artifact@v4
+        with:
+          name: results.sarif
+          path: results.sarif
+
+      - name: PR Suggester according to SARIF file
+        # if: github.event_name == 'pull_request_target'
+        uses: HollowMan6/sarif4reviewdog@v1.0.0
+        with:
+          file: 'results.sarif'
+          level: warning
+          filter_mode: nofilter

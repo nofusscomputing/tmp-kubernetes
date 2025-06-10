@@ -1,0 +1,31 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: centurion-worker
+spec:
+  endpointSelector:
+    matchLabels:
+      name: centurion
+      component: worker
+  ingress:
+    - {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toServices:
+        - k8sService:
+            serviceName: main-rw
+            namespace: postgres
+    - toServices:
+        - k8sService:
+            serviceName: main
+            namespace: rabbitmq

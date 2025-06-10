@@ -1,0 +1,38 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: centurion-api
+spec:
+  endpointSelector:
+    matchLabels:
+      name: centurion
+      component: api
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+            app.kubernetes.io/component: controller
+            io.kubernetes.pod.namespace: ingress
+      toPorts:
+        - ports:
+            - port: "80"
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toServices:
+        - k8sService:
+            serviceName: main-rw
+            namespace: postgres
+    - toServices:
+        - k8sService:
+            serviceName: main
+            namespace: rabbitmq
