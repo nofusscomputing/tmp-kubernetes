@@ -63,7 +63,6 @@ jobs:
 
       - name: Run Kubescape scan
         run: |
-          cd ${PWD}/manifests/nginx/;
           kubescape scan framework AllControls . \
             --verbose \
             --format sarif \
