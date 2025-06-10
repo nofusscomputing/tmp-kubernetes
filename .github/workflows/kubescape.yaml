@@ -59,11 +59,11 @@ jobs:
           
       - name: Run Kubescape debug
         run: |
-          kubescape list frameworks
+          kubescape --helh
 
       - name: Run Kubescape scan
         run: |
-          kubescape scan framework AllControls nginx/ \
+          kubescape scan framework AllControls nginx/. \
             --verbose \
             --format sarif \
             --output results.sarif
