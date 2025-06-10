@@ -63,7 +63,7 @@ jobs:
 
       - name: Run Kubescape scan
         run: |
-          kubescape scan framework AllControls nginx/. \
+          kubescape scan framework AllControls nginx/* \
             --verbose \
             --format sarif \
             --output results.sarif
